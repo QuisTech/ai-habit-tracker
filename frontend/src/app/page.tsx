@@ -8,40 +8,61 @@ export default function Home() {
   const [description, setDescription] = useState("");
   const [darkMode, setDarkMode] = useState(false);
 
-  // Completed / total count for progress bar
   const completedCount = habits.filter((h: any) => h.completed).length;
   const totalCount = habits.length;
 
+  // Fetch habits from backend
   const fetchHabits = async () => {
-    const res = await fetch("http://localhost:5000/habits");
-    const data = await res.json();
-    setHabits(data);
+    try {
+      const res = await fetch("http://localhost:5000/habits");
+      const data = await res.json();
+      setHabits(data);
+    } catch (err) {
+      alert("Failed to fetch habits from backend");
+      console.error(err);
+    }
   };
 
   const addHabit = async () => {
-    if (!name) return alert("Please enter a habit name");
-    await fetch("http://localhost:5000/habits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description }),
-    });
-    setName("");
-    setDescription("");
-    fetchHabits();
+    if (!name.trim()) return alert("Please enter a habit name");
+    try {
+      await fetch("http://localhost:5000/habits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, description }),
+      });
+      setName("");
+      setDescription("");
+      fetchHabits();
+    } catch (err) {
+      alert("Failed to add habit");
+      console.error(err);
+    }
   };
 
   const toggleHabit = async (id: number, completed: boolean) => {
-    await fetch(`http://localhost:5000/habits/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed: !completed }),
-    });
-    fetchHabits();
+    try {
+      await fetch(`http://localhost:5000/habits/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ completed: !completed }),
+      });
+      fetchHabits();
+    } catch (err) {
+      alert("Failed to update habit");
+      console.error(err);
+    }
   };
 
   const deleteHabit = async (id: number) => {
-    await fetch(`http://localhost:5000/habits/${id}`, { method: "DELETE" });
-    fetchHabits();
+    if (!confirm("Are you sure you want to delete this habit?")) return;
+    try {
+      await fetch(`http://localhost:5000/habits/${id}`, { method: "DELETE" });
+      fetchHabits();
+    } catch (err) {
+      alert("Failed to delete habit");
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -49,67 +70,43 @@ export default function Home() {
   }, []);
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-700 ease-in-out ${
-        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-      }`}
-    >
+    <div className={`min-h-screen transition-colors duration-700 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
       {/* Header */}
-      <header
-        className={`flex justify-between items-center px-8 py-5 shadow-md transition-colors duration-700 ${
-          darkMode ? "bg-gray-800" : "bg-white"
-        }`}
-      >
+      <header className={`flex justify-between items-center px-8 py-5 shadow-md transition-colors duration-700 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
         <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
           <span className="text-blue-500">AI</span> Habit Tracker
         </h1>
-
-        {/* Theme toggle */}
         <button
           onClick={() => setDarkMode(!darkMode)}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 ${
-            darkMode
-              ? "bg-gray-700 border-gray-600 hover:bg-gray-600"
-              : "bg-gray-100 border-gray-300 hover:bg-gray-200"
+            darkMode ? "bg-gray-700 border-gray-600 hover:bg-gray-600" : "bg-gray-100 border-gray-300 hover:bg-gray-200"
           }`}
         >
-          <span
-            className={`transition-transform duration-500 ${
-              darkMode ? "rotate-180" : "rotate-0"
-            }`}
-          >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </span>
-          {darkMode ? "Light Mode" : "Dark Mode"}
+          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+          <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
         </button>
       </header>
 
-      {/* Main App */}
+      {/* Main */}
       <main className="flex flex-col items-center py-10 px-4">
-        {/* Input Section */}
+        {/* Input */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
             className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${
-              darkMode
-                ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500"
-                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
+              darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
             }`}
             placeholder="Habit name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-
           <input
             className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${
-              darkMode
-                ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500"
-                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
+              darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
             }`}
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
-
           <button
             className="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-md"
             onClick={addHabit}
@@ -120,6 +117,7 @@ export default function Home() {
 
         {/* Habit List */}
         <ul className="w-full sm:w-[600px] space-y-4">
+          {habits.length === 0 && <p className="text-gray-500 dark:text-gray-400 text-center">No habits yet. Add one above!</p>}
           {habits.map((habit: any) => (
             <li
               key={habit.id}
@@ -134,42 +132,22 @@ export default function Home() {
               }`}
             >
               <div>
-                <h3
-                  className={`text-lg sm:text-xl font-extrabold mb-1 tracking-tight ${
-                    habit.completed
-                      ? "line-through text-gray-400 dark:text-gray-500"
-                      : darkMode
-                      ? "text-white"
-                      : "text-gray-900"
-                  }`}
-                >
+                <h3 className={`text-lg sm:text-xl font-extrabold mb-1 tracking-tight ${habit.completed ? "line-through text-gray-400 dark:text-gray-500" : darkMode ? "text-white" : "text-gray-900"}`}>
                   {habit.name}
                 </h3>
-                <p
-                  className={`text-base sm:text-lg ${
-                    habit.completed
-                      ? "opacity-70"
-                      : darkMode
-                      ? "text-gray-300"
-                      : "text-gray-800"
-                  }`}
-                >
+                <p className={`text-base sm:text-lg ${habit.completed ? "opacity-70" : darkMode ? "text-gray-300" : "text-gray-800"}`}>
                   {habit.description}
                 </p>
               </div>
-
               <div className="flex gap-3">
                 <button
                   className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-sm ${
-                    habit.completed
-                      ? "bg-yellow-500 hover:bg-yellow-600"
-                      : "bg-green-600 hover:bg-green-700"
+                    habit.completed ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"
                   }`}
                   onClick={() => toggleHabit(habit.id, habit.completed)}
                 >
                   {habit.completed ? "Undo" : "Done"}
                 </button>
-
                 <button
                   className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-500 hover:bg-red-600 transition-all duration-200 shadow-sm"
                   onClick={() => deleteHabit(habit.id)}
@@ -187,11 +165,7 @@ export default function Home() {
             <span className="font-semibold text-gray-800 dark:text-gray-200">
               Completed {completedCount} of {totalCount} habits 🎯
             </span>
-
-            <div
-              className="relative w-full sm:w-1/2 h-4 rounded-full overflow-hidden group"
-              title={`${Math.round((completedCount / totalCount) * 100)}% completed`}
-            >
+            <div className="relative w-full sm:w-1/2 h-4 rounded-full overflow-hidden group" title={`${Math.round((completedCount / totalCount) * 100)}% completed`}>
               <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
               <div
                 className="h-4 rounded-full transition-all duration-700 ease-in-out"
