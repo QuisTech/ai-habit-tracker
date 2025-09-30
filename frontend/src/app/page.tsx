@@ -3,12 +3,13 @@ import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 
 export default function Home() {
-  const [habits, setHabits] = useState([]);
+  const [habits, setHabits] = useState<any[]>([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [darkMode, setDarkMode] = useState(false);
+  const [suggestion, setSuggestion] = useState("");
 
-  const completedCount = habits.filter((h: any) => h.completed).length;
+  const completedCount = habits.filter((h) => h.completed).length;
   const totalCount = habits.length;
 
   // Fetch habits from backend
@@ -19,6 +20,18 @@ export default function Home() {
       setHabits(data);
     } catch (err) {
       alert("Failed to fetch habits from backend");
+      console.error(err);
+    }
+  };
+
+  // Fetch OpenAI suggestion
+  const fetchSuggestion = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/suggest-habit");
+      const data = await res.json();
+      setSuggestion(data.suggestion);
+    } catch (err) {
+      alert("Failed to fetch suggestion");
       console.error(err);
     }
   };
@@ -78,9 +91,7 @@ export default function Home() {
         </h1>
         <button
           onClick={() => setDarkMode(!darkMode)}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 ${
-            darkMode ? "bg-gray-700 border-gray-600 hover:bg-gray-600" : "bg-gray-100 border-gray-300 hover:bg-gray-200"
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 ${darkMode ? "bg-gray-700 border-gray-600 hover:bg-gray-600" : "bg-gray-100 border-gray-300 hover:bg-gray-200"}`}
         >
           {darkMode ? <Sun size={18} /> : <Moon size={18} />}
           <span>{darkMode ? "Light Mode" : "Dark Mode"}</span>
@@ -92,17 +103,13 @@ export default function Home() {
         {/* Input */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <input
-            className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${
-              darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
-            }`}
+            className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"}`}
             placeholder="Habit name"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
           <input
-            className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${
-              darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"
-            }`}
+            className={`border focus:ring-2 rounded-lg px-4 py-2 w-64 outline-none shadow-md transition-all duration-300 placeholder-gray-500 ${darkMode ? "bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:ring-blue-500" : "bg-white border-gray-300 text-gray-900 focus:ring-blue-300"}`}
             placeholder="Description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -113,23 +120,26 @@ export default function Home() {
           >
             Add
           </button>
+          <button
+            className="bg-purple-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-purple-700 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-md"
+            onClick={fetchSuggestion}
+          >
+            Get Suggestion
+          </button>
         </div>
+
+        {/* Display OpenAI suggestion */}
+        {suggestion && (
+          <div className="mb-6 text-center text-blue-600 font-semibold">{suggestion}</div>
+        )}
 
         {/* Habit List */}
         <ul className="w-full sm:w-[600px] space-y-4">
           {habits.length === 0 && <p className="text-gray-500 dark:text-gray-400 text-center">No habits yet. Add one above!</p>}
-          {habits.map((habit: any) => (
+          {habits.map((habit) => (
             <li
               key={habit.id}
-              className={`flex justify-between items-center rounded-3xl shadow-lg p-6 border transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl ${
-                habit.completed
-                  ? darkMode
-                    ? "bg-green-900 border-green-700"
-                    : "bg-emerald-100 border-emerald-400"
-                  : darkMode
-                  ? "bg-gray-800 border-gray-700 hover:border-blue-500"
-                  : "bg-white border-gray-300 hover:border-blue-500"
-              }`}
+              className={`flex justify-between items-center rounded-3xl shadow-lg p-6 border transition-all duration-500 transform hover:-translate-y-1 hover:shadow-2xl ${habit.completed ? darkMode ? "bg-green-900 border-green-700" : "bg-emerald-100 border-emerald-400" : darkMode ? "bg-gray-800 border-gray-700 hover:border-blue-500" : "bg-white border-gray-300 hover:border-blue-500"}`}
             >
               <div>
                 <h3 className={`text-lg sm:text-xl font-extrabold mb-1 tracking-tight ${habit.completed ? "line-through text-gray-400 dark:text-gray-500" : darkMode ? "text-white" : "text-gray-900"}`}>
@@ -141,9 +151,7 @@ export default function Home() {
               </div>
               <div className="flex gap-3">
                 <button
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-sm ${
-                    habit.completed ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"
-                  }`}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all duration-200 shadow-sm ${habit.completed ? "bg-yellow-500 hover:bg-yellow-600" : "bg-green-600 hover:bg-green-700"}`}
                   onClick={() => toggleHabit(habit.id, habit.completed)}
                 >
                   {habit.completed ? "Undo" : "Done"}
