@@ -40,11 +40,13 @@ export default function Home() {
 
   const COLORS = ["#3b82f6", "#d1d5db"];
 
-  // ✅ Fix for Recharts unknown percent type
-  const pieLabel = (props: PieLabelRenderProps) => {
-    const { name, percent } = props as { name: string; percent: number };
-    return `${name} ${(percent * 100).toFixed(0)}%`;
-  };
+  // Pie label for Recharts
+const pieLabel = (props: PieLabelRenderProps) => {
+  const name = props.name;
+  // Safely handle percent as number (it might be undefined)
+  const percent = typeof props.percent === "number" ? props.percent : 0;
+  return `${name} ${(percent * 100).toFixed(0)}%`;
+};
 
   const fetchHabits = async (): Promise<void> => {
     try {
