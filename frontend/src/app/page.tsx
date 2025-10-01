@@ -265,4 +265,54 @@ export default function Home() {
         {/* Progress + Chart */}
         {totalCount > 0 && (
           <>
-            <div className="w-full sm:w-[600px] mt-8 p-4 rounded-xl shadow-md bg-white dark:bg-gray
+            <div className="w-full sm:w-[600px] mt-8 p-4 rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3 transition-colors duration-500">
+              <span className="font-semibold text-gray-800 dark:text-gray-200">
+                Completed {completedCount} of {totalCount} habits 🎯
+              </span>
+              <div
+                className="relative w-full sm:w-1/2 h-4 rounded-full overflow-hidden group"
+                title={`${Math.round((completedCount / totalCount) * 100)}% completed`}
+              >
+                <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                <div
+                  className="h-4 rounded-full transition-all duration-700 ease-in-out"
+                  style={{
+                    width: `${(completedCount / totalCount) * 100}%`,
+                    background: "linear-gradient(90deg, #3b82f6, #06b6d4)",
+                  }}
+                />
+                <span className="absolute right-0 -top-6 bg-gray-800 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {Math.round((completedCount / totalCount) * 100)}%
+                </span>
+              </div>
+            </div>
+
+            <div className="w-full sm:w-[600px] mt-8 p-6 rounded-xl shadow-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-bold mb-4 text-gray-800 dark:text-gray-200">
+                Progress Overview 📊
+              </h2>
+              <ResponsiveContainer width="100%" height={250}>
+                <PieChart>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    labelLine={false}
+                    label={pieLabel}
+                    dataKey="value"
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </main>
+    </div>
+  );
+}
