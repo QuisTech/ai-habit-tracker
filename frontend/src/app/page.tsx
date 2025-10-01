@@ -8,6 +8,7 @@ import {
   Cell,
   Tooltip,
   ResponsiveContainer,
+  PieLabelRenderProps,
 } from "recharts";
 
 // ✅ Define the types to eliminate all implicit any warnings
@@ -109,6 +110,11 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to delete habit:", err);
     }
+  };
+
+  const pieLabel = (props: PieLabelRenderProps) => {
+    const { name, percent } = props;
+    return `${name} ${(percent * 100).toFixed(0)}%`;
   };
 
   useEffect(() => {
@@ -264,9 +270,7 @@ export default function Home() {
               </span>
               <div
                 className="relative w-full sm:w-1/2 h-4 rounded-full overflow-hidden group"
-                title={`${Math.round(
-                  (completedCount / totalCount) * 100
-                )}% completed`}
+                title={`${Math.round((completedCount / totalCount) * 100)}% completed`}
               >
                 <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 rounded-full" />
                 <div
@@ -294,9 +298,7 @@ export default function Home() {
                     cy="50%"
                     outerRadius={80}
                     labelLine={false}
-                    label={({ name, percent }: { name: string; percent: number }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
+                    label={pieLabel}
                     dataKey="value"
                   >
                     {chartData.map((entry, index) => (
