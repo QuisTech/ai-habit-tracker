@@ -3,7 +3,7 @@
 An intelligent habit tracking web app powered by **Next.js 15**, **Prisma**, **Supabase**, **NextAuth**, and **OpenAI**.  
 Users can sign up, log in, and track their daily habits — with AI insights to help them stay consistent and motivated.
 
----
+
 
 ## 🚀 Features
 
@@ -14,7 +14,10 @@ Users can sign up, log in, and track their daily habits — with AI insights to 
 ✅ **Data access with Prisma ORM**  
 ✅ **Deployed on Vercel**
 
----
+<img width="1366" height="768" alt="Screenshot (30)" src="https://github.com/user-attachments/assets/e6b49899-47cd-41d2-ac1f-9b1e6ad81de4" />
+<img width="1366" height="768" alt="Screenshot (29)" src="https://github.com/user-attachments/assets/47eefbb9-026f-4b09-a0f4-70ee7872b199" />
+<img width="1366" height="768" alt="Screenshot (28)" src="https://github.com/user-attachments/assets/3c867c75-8f7d-4d31-b7b6-f381a9e3828e" />
+
 
 ## 🗂️ Project Structure
 
